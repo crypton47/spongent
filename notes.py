@@ -29,26 +29,33 @@ def abso(m,rr):
         state = int2list(mr) + state[8:]
         state = PI(state)
     return state
-    
+def Hash(m,r):
+    state = abso(m,r)
+    output = []
+    for _ in range(4):
+        output = output + state[:r]
+        state = PI(state)
+    output = list2int(output)
+    return output
 
 def PI(state):
     # R = 45 for SPONGENT-88
     # Convert the list state to the int 
     for i in range(45):
-        state = (InvlCounter(i) << 80) ^ list2int(state) ^ lCounter(i)
+        numb = list2int(state)
+        state = InvlCounter(i,numb << 80) ^ numb ^ lCounter(i,numb)
         paddstate = ['0' for _ in range(88 - len(int2list(state)))]
         state = sBoxLayer(paddstate + int2list(state))
         state = pLayer(state)
     return state
  # the article doesnt explain how the LFSR depends on b.
-def lCounter(i):
+def lCounter(i,m):
     """ lCounter is a state of an LSFR """
-    m  = 0b000101
-    for j in range(i):
+    for _ in range(i):
         m = (m >> 1) | (((m & 1) ^ ((m & 2) >> 1)) << 5)        
     return m
-def InvlCounter(i):
-    m = lCounter(i)
+def InvlCounter(i,s):
+    m = lCounter(i,s)
     s = ((m&1)<<5)|((m&2)<<3)|((m&4)<<1)|((m&8)>>1)|((m&16)>>3)|((m&32)>>5)
     return s 
 
