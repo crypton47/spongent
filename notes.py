@@ -1,6 +1,7 @@
 # Author : BATALI OUALID 
 # MASTER MCSC2 - 2019/2020
-# PROJET CRYPTOGRAPHIE AVANCEE : 
+# PROJET CRYPTOGRAPHIE AVANCEE 
+# Ce script a besoin de quelques modifications ! 
 
 
 def list2int(alist):
@@ -32,7 +33,7 @@ def abso(m,rr):
 def Hash(m,r):
     state = abso(m,r)
     output = []
-    for _ in range(4):
+    for _ in range(10):
         output = output + state[:r]
         state = PI(state)
     output = list2int(output)
@@ -42,20 +43,20 @@ def PI(state):
     # R = 45 for SPONGENT-88
     # Convert the list state to the int 
     for i in range(45):
-        numb = list2int(state)
-        state = InvlCounter(i,numb << 80) ^ numb ^ lCounter(i,numb)
+        state = InvlCounter(i) << 80 ^ list2int(state) ^ lCounter(i)
         paddstate = ['0' for _ in range(88 - len(int2list(state)))]
         state = sBoxLayer(paddstate + int2list(state))
         state = pLayer(state)
     return state
  # the article doesnt explain how the LFSR depends on b.
-def lCounter(i,m):
+def lCounter(i):
     """ lCounter is a state of an LSFR """
+    m = 0b000101
     for _ in range(i):
         m = (m >> 1) | (((m & 1) ^ ((m & 2) >> 1)) << 5)        
     return m
-def InvlCounter(i,s):
-    m = lCounter(i,s)
+def InvlCounter(i):
+    m = lCounter(i)
     s = ((m&1)<<5)|((m&2)<<3)|((m&4)<<1)|((m&8)>>1)|((m&16)>>3)|((m&32)>>5)
     return s 
 
